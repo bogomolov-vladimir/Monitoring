@@ -11,9 +11,9 @@ import time
 from prometheus_client import start_http_server, Summary, Gauge
 
 markets_url = os.environ.get('ISUN_MARKETS_URL', "https://pub-new.unitex.one")
-sid = os.environ.get('ISUN_SID', '628a9ed9-100d-429d-8baa-3771f747612a')
-key = os.environ.get('ISUN_KEY', '2d8fd882-5dc5-4451-8422-52736e90ac84')
-secret = os.environ.get('ISUN_SECRET', '6c86b656a8c23dded9f474a69e29a91f3ad0574a2f6fc3567162cd5df164c7a7')
+sid = os.environ.get('ISUN_SID', '')
+key = os.environ.get('ISUN_KEY', '')
+secret = os.environ.get('ISUN_SECRET', '')
 url = markets_url
 path='/api/v1/wallet/list'
 Cur_list=[]
