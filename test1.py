@@ -9,7 +9,7 @@ import json
 import time
 from prometheus_client import start_http_server, Summary, Gauge
 
-url = os.environ.get('ISUN_MARKETS_URL', "https://pub-new.unitex.one")
+url = os.environ.get('ISUN_MARKETS_URL', "")
 sid = os.environ.get('ISUN_SID', '')
 key = os.environ.get('ISUN_KEY', '')
 secret = os.environ.get('ISUN_SECRET', '')
