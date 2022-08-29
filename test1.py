@@ -54,8 +54,8 @@ if __name__ == '__main__':
     while True:
 
         pre_data=getjson_private(path,sid,key,secret,url)
-        gAvalues = gauge_reparation('isAvailable')#[[i['currencyCode'],i['reserved']] for i in pre_data['list']]
-        gRvalues = gauge_reparation('reserved')#[[i['currencyCode'],i['isAvailable']] for i in pre_data['list']]
+        gAvalues = gauge_reparation('isAvailable')
+        gRvalues = gauge_reparation('reserved')
         gTvalues = [[i['currencyCode'],i['isAvailable']+i['reserved']] for i in pre_data['list']]
         for C,V in gAvalues:
             print(C, V)
