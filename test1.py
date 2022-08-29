@@ -1,32 +1,30 @@
 import os
-#import sys
+from telnetlib import GA
 import requests
 import base64
 import hmac
 import hashlib
 import binascii
-#import pandas as pd
 import json
 import time
 from prometheus_client import start_http_server, Summary, Gauge
 
-markets_url = os.environ.get('ISUN_MARKETS_URL', "https://pub-new.unitex.one")
+url = os.environ.get('ISUN_MARKETS_URL', "https://pub-new.unitex.one")
 sid = os.environ.get('ISUN_SID', '')
 key = os.environ.get('ISUN_KEY', '')
 secret = os.environ.get('ISUN_SECRET', '')
-url = markets_url
 path='/api/v1/wallet/list'
-Cur_list=[]
-#title_table=pd.DataFrame(['AVAILABLE','RESERVED','TOTAL','ORIGIN'], columns=['Title'])
-
-
+"""
+gaugeReserved_values = []
+gaugeAvailable_values = []
+gaugeTotal_values = []
+parametrs=['isAvailable','reserved','Total']
+"""
 def hmac_value(key,data):
-    #return "3d1cadcfd259dd686e4a817bc70025c7084da26971a84a2ca3c3a05eac23c74e"
     byte_key = bytes(key, 'UTF-8')
     #byte_key = binascii.unhexlify(key)
     h = hmac.new(byte_key, data.encode(), hashlib.sha256)
     return h.hexdigest()
-
 
 def getjson_private(path,sid,key,secret,url,extra_params={}):
     headers = {"X-api-sid": sid,
@@ -42,9 +40,20 @@ def getjson_private(path,sid,key,secret,url,extra_params={}):
         return response.json()
     else:return response.json()
     raise Exception ("Invalid status code "+str(response.status_code)+" url:"+url+" message"+str(response.content))
+"""
+gaugeAvailable = Gauge('isAvailable', 'Currency Available', labelnames=['currency'])
+gaugeReserved = Gauge('reserved', 'Currency Reserved', labelnames=['currency'])
+gaugeTotal = Gauge('Total', 'Currency Total', labelnames=['currency'])
+"""
+def Gauge_parsing(param1,param2):
+    return Gauge(param1, param2, labelnames=['currency'])
 
-gA = Gauge('isAvailable', 'Currency Available', labelnames=['currency'])
-gR = Gauge('reserved', 'Currency Reserved', labelnames=['currency'])
+gaugeAvailable = Gauge_parsing('isAvailable', 'Currency Available')
+gaugeReserved = Gauge_parsing('reserved', 'Currency Reserved')
+gaugeTotal = Gauge_parsing('Total', 'Currency Total')
+
+def gauge_reparation(param):
+    return [[i['currencyCode'],i[param]] for i in pre_data['list']]
 
 if __name__ == '__main__':
     # Start up the server to expose the metrics.
@@ -52,11 +61,13 @@ if __name__ == '__main__':
     # Generate some requests.
     while True:
         pre_data=getjson_private(path,sid,key,secret,url)
-        gRvalues = [[i['currencyCode'],i['reserved']] for i in pre_data['list']]
-        gAvalues = [[i['currencyCode'],i['isAvailable']] for i in pre_data['list']]
+        gRvalues = gauge_reparation('isAvailable')#[[i['currencyCode'],i['reserved']] for i in pre_data['list']]
+        gAvalues = gauge_reparation('reserved')#[[i['currencyCode'],i['isAvailable']] for i in pre_data['list']]
+        gTvalues = [[i['currencyCode'],i['isAvailable']+i['reserved']] for i in pre_data['list']]
         for C,V in gAvalues:
-            print(C, V)
-            gA.labels(C).set(V)
+            gaugeAvailable.labels(C).set(V)
         for C,V in gRvalues:
-            gR.labels(C).set(V)
+            gaugeReserved.labels(C).set(V)
+        for C,V in gTvalues:
+            gaugeTotal.labels(C).set(V)
         time.sleep(10)
