@@ -55,19 +55,31 @@ if __name__ == '__main__':
         availableValues = gauge_preparation('isAvailable', pre_data['list'])
         reservedValues = gauge_preparation('reserved', pre_data['list'])
         totalValues = [[i['currencyCode'],i['isAvailable']+i['reserved']] for i in pre_data['list']]
-
-        values_zip = zip(availableValues, reservedValues, totalValues)
-        for available_items, reserved_items, total_items in values_zip:
-            gaugeAvailable.labels(available_items[0]).set(available_items[1])
-            gaugeReserved.labels(reserved_items[0]).set(reserved_items[1])
-            gaugeTotal.labels(total_items[0]).set(total_items[1])
-"""
-        for currency,value in availableValues:
-            gaugeAvailable.labels(currency).set(value)
-        for currency,value in reservedValues:
-            gaugeReserved.labels(currency).set(value)
-        for currency,value in totalValues:
-            gaugeTotal.labels(currency).set(value)
-            time.sleep(10)
-"""
+        for C,V in availableValues:
+            gaugeAvailable.labels(C).set(V)
+        for C,V in reservedValues:
+            gaugeReserved.labels(C).set(V)
+        for C,V in totalValues:
+            gaugeTotal.labels(C).set(V)
         time.sleep(10)
+        
+        
+        #ne rabotaet
+        #values_zip = zip(availableValues, reservedValues, totalValues)
+        #for available_items, reserved_items, total_items in values_zip:
+        #    gaugeAvailable.labels(available_items[0]).set(available_items[1])
+        #    gaugeReserved.labels(reserved_items[0]).set(reserved_items[1])
+        #    gaugeTotal.labels(total_items[0]).set(total_items[1])
+        #    time.sleep(10)
+        
+#toze ne rabotaet esli menja c na Currencies i v na Values, hz po4emu            
+"""
+        for Currencies,Values in availableValues:
+            gaugeAvailable.labels(Currencies).set(Values)
+        for Currencies,Values in reservedValues:
+            gaugeReserved.labels(Currencies).set(Values)
+        for Currencies,Values in totalValues:
+            gaugeTotal.labels(Currencies).set(Values)
+        time.sleep(10)
+"""
+        
