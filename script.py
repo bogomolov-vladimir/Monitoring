@@ -62,11 +62,12 @@ if __name__ == '__main__':
             gaugeReserved.labels(reserved_items[0]).set(reserved_items[1])
             gaugeTotal.labels(total_items[0]).set(total_items[1])
 """
-        for C,V in availableValues:
-            gaugeAvailable.labels(C).set(V)
-        for C,V in reservedValues:
-            gaugeReserved.labels(C).set(V)
-        for C,V in totalValues:
-            gaugeTotal.labels(C).set(V)
+        for currency,value in availableValues:
+            gaugeAvailable.labels(currency).set(value)
+        for currency,value in reservedValues:
+            gaugeReserved.labels(currency).set(value)
+        for currency,value in totalValues:
+            gaugeTotal.labels(currency).set(value)
+            time.sleep(10)
 """
         time.sleep(10)
