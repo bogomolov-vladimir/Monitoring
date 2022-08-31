@@ -36,7 +36,7 @@ def getjson_private(path,sid,key,secret,url,extra_params={}):
     else:return response.json()
     raise Exception ("Invalid status code "+str(response.status_code)+" url:"+url+" message"+str(response.content))
 
-def gauge_reparation(param, data):
+def gauge_preparation(param, data):
     return [[i['currencyCode'],i[param]] for i in data]
 
 def Gauge_parsing(param1,param2):
@@ -51,17 +51,22 @@ if __name__ == '__main__':
     start_http_server(8887)
     # Generate some requests.
     while True:
-
         pre_data=getjson_private(path,sid,key,secret,url)
-        gAvalues = gauge_reparation('isAvailable', pre_data['list'])
-        gRvalues = gauge_reparation('reserved', pre_data['list'])
-        gTvalues = [[i['currencyCode'],i['isAvailable']+i['reserved']] for i in pre_data['list']]
-        #if changing this loop into def , it stops working
-        for C,V in gAvalues: 
-            print(C, V)
+        availableValues = gauge_preparation('isAvailable', pre_data['list'])
+        reservedValues = gauge_preparation('reserved', pre_data['list'])
+        totalValues = [[i['currencyCode'],i['isAvailable']+i['reserved']] for i in pre_data['list']]
+
+        values_zip = zip(availableValues, reservedValues, totalValues)
+        for available_items, reserved_items, total_items in values_zip:
+            gaugeAvailable.labels(available_items[0]).set(available_items[1])
+            gaugeReserved.labels(reserved_items[0]).set(reserved_items[1])
+            gaugeTotal.labels(total_items[0]).set(total_items[1])
+"""
+        for C,V in availableValues:
             gaugeAvailable.labels(C).set(V)
-        for C,V in gRvalues:
+        for C,V in reservedValues:
             gaugeReserved.labels(C).set(V)
-        for C,V in gTvalues:
+        for C,V in totalValues:
             gaugeTotal.labels(C).set(V)
+"""
         time.sleep(10)
